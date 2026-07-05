@@ -1,17 +1,107 @@
+
 ```js
 FROM node:22
 
+# Set working directory
 WORKDIR /app
 
+# Copy package files
 COPY package*.json ./
 
+# Install dependencies
 RUN npm install
 
+# Copy project files
 COPY . .
 
+# Expose Next.js port
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]   
+# Start development server
+CMD ["npm", "run", "dev"]
+
+```
+
+```
+Without volume:
+
+docker run -p 3000:3000 my-app
+
+
+Now suppose your project is here on your Mac:
+
+/Users/prashant/Documents/Veyra/fronted/app
+
+for bind Volume you 
+
+You start the container like this:
+
+docker run \
+-p 3000:3000 \
+-v /Users/rajatmaurya/Documents/Veyra/fronted:/app \ 
+-v /app/node_modules \
+my-app
+
+
+ Explanationt:
+
+-v means:
+
+"Connect (mount) one folder to another folder."
+
+[
+    ➡️ -v /Users/rajatmaurya/Documents/Veyra/fronted:/app
+
+means:
+
+"Connect the project folder on my MacBook to the /app folder inside the container."
+
+]
+
+[ ➡️  -v /app/node_modules \
+
+Ignore the node_modules that comes from my MacBook, and use Docker's own node_modules."
+
+The node_modules is not in the container, it is just connected by the container."
+
+After this command:
+
+-v /Users/rajatmaurya/Documents/Veyra/fronted:/app
+
+the container sees:
+
+/app
+├── app
+├── package.json
+└── node_modules   ← from your MacBook
+
+Then this command:
+
+-v /app/node_modules
+
+says:
+
+❌ Don't use this node_modules (from MacBook).
+
+✅ Use Docker's own node_modules instead.
+
+So the final result is:
+
+MacBook
+project
+├── app
+├── package.json
+└── node_modules   ❌ ignored
+
+Container
+/app
+├── app            ← from MacBook
+├── package.json   ← from MacBook
+└── node_modules   ← Docker's own
+
+]
+
+we can remove copy .. which copy source code because it is not required duing build phase we can access it by bind mount
 
 ```
 
